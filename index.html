@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معمل الصياد للتحاليل الطبية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Style for the login modal */
+        #loginModal {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-lg p-8 w-full max-w-sm text-center">
+            <h2 class="text-2xl font-bold mb-4 text-blue-800">الدخول كطبيب أو فني</h2>
+            <form id="loginForm" class="space-y-4">
+                <input type="password" id="loginCode" placeholder="أدخل كود الدخول" required
+                    class="w-full p-3 rounded-xl border border-gray-300">
+                <button type="submit"
+                    class="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition duration-300">دخول</button>
+            </form>
+            <p class="mt-4 text-sm text-gray-500">للمرضى، لا تحتاج لإدخال كود. انقر في أي مكان خارج هذه النافذة
+                للمتابعة.</p>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="w-full bg-white shadow-lg p-4 rounded-b-3xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-blue-800">معمل الصياد</h1>
+            <nav class="hidden md:flex space-x-4 space-x-reverse text-lg font-semibold">
+                <a href="#patient-section" class="hover:text-blue-600 transition duration-300">المرضى</a>
+                <a href="#doctor-section" class="hover:text-blue-600 transition duration-300">الأطباء</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="w-full max-w-7xl px-4 py-8 flex-grow">
+        <!-- User ID Display -->
+        <div class="p-4 bg-blue-100 text-blue-700 rounded-xl shadow-inner mb-8 text-center">
+            <p class="font-bold">كود المريض الخاص بك:</p>
+            <p id="userIdDisplay" class="text-lg font-mono break-all">يتم التحميل...</p>
+        </div>
+
+        <!-- Patient Section (Always visible) -->
+        <section id="patient-section" class="bg-white rounded-3xl p-8 shadow-lg mb-8">
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-blue-800">قسم المرضى</h3>
+            <div class="p-6 bg-gray-50 rounded-2xl shadow-md mb-8">
+                <h4 class="text-2xl font-bold mb-4 text-blue-700">طلب تحليل أو استفسار جديد</h4>
+                <form id="requestForm" class="space-y-4">
+                    <input type="text" id="patientName" placeholder="اسم المريض" required
+                        class="w-full p-3 rounded-xl border border-gray-300">
+                    <textarea id="requestDetails" placeholder="تفاصيل الطلب أو الاستفسار" rows="4" required
+                        class="w-full p-3 rounded-xl border border-gray-300"></textarea>
+                    <button type="submit"
+                        class="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition duration-300">إرسال
+                        الطلب</button>
+                </form>
+                <div id="requestMessage" class="mt-4 text-center hidden p-3 rounded-xl"></div>
+            </div>
+
+            <div class="p-6 bg-gray-50 rounded-2xl shadow-md mb-8">
+                <h4 class="text-2xl font-bold mb-4 text-blue-700">حجز موعد</h4>
+                <form id="appointmentForm" class="space-y-4">
+                    <input type="text" id="appointmentName" placeholder="اسم المريض" required
+                        class="w-full p-3 rounded-xl border border-gray-300">
+                    <textarea id="appointmentReason" placeholder="سبب حجز الموعد (مثلاً: تحليل شامل)" rows="2" required
+                        class="w-full p-3 rounded-xl border border-gray-300"></textarea>
+                    <input type="datetime-local" id="appointmentDateTime" required
+                        class="w-full p-3 rounded-xl border border-gray-300">
+                    <button type="submit"
+                        class="w-full bg-yellow-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-yellow-600 transition duration-300">حجز
+                        الموعد</button>
+                </form>
+                <div id="appointmentMessage" class="mt-4 text-center hidden p-3 rounded-xl"></div>
+            </div>
+
+            <div class="p-6 bg-gray-50 rounded-2xl shadow-md">
+                <h4 class="text-2xl font-bold mb-4 text-blue-700">الردود والنتائج</h4>
+                <div id="myResults" class="space-y-4">
+                    <p class="text-center text-gray-500">جاري تحميل الردود والنتائج...</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-10 border-gray-300">
+
+        <!-- Role-based sections (initially hidden) -->
+        <div id="adminSections" class="hidden">
+            <!-- Doctor Section -->
+            <section id="doctor-section" class="bg-white rounded-3xl p-8 shadow-lg mb-8">
+                <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-blue-800">قسم الأطباء</h3>
+
+                <div class="p-6 bg-gray-50 rounded-2xl shadow-md mb-8">
+                    <h4 class="text-2xl font-bold mb-4 text-blue-700">رفع نتيجة تحليل</h4>
+                    <form id="uploadForm" class="space-y-4">
+                        <input type="text" id="uploadPatientId" placeholder="كود المريض (UserId)" required
+                            class="w-full p-3 rounded-xl border border-gray-300">
+                        <input type="text" id="testName" placeholder="اسم التحليل" required
+                            class="w-full p-3 rounded-xl border border-gray-300">
+                        <input type="file" id="uploadFile" accept=".pdf" required
+                            class="w-full p-3 rounded-xl border border-gray-300 bg-white cursor-pointer">
+                        <button type="submit"
+                            class="w-full bg-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-600 transition duration-300 flex items-center justify-center space-x-2 space-x-reverse">
+                            <span>رفع النتيجة</span>
+                            <div id="uploadLoader" class="loader hidden"></div>
+                        </button>
+                    </form>
+                    <div id="uploadMessage" class="mt-4 text-center hidden p-3 rounded-xl"></div>
+                </div>
+
+                <div class="p-6 bg-gray-50 rounded-2xl shadow-md mb-8">
+                    <h4 class="text-2xl font-bold mb-4 text-blue-700">طلبات واستفسارات المرضى</h4>
+                    <ul id="requestsList" class="space-y-4">
+                        <p class="text-center text-gray-500">جاري تحميل الطلبات...</p>
+                    </ul>
+                </div>
+
+                <div class="p-6 bg-gray-50 rounded-2xl shadow-md">
+                    <h4 class="text-2xl font-bold mb-4 text-blue-700">طلبات حجز المواعيد</h4>
+                    <ul id="appointmentsList" class="space-y-4">
+                        <p class="text-center text-gray-500">جاري تحميل طلبات المواعيد...</p>
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <!-- Facebook Posts Section -->
+        <section id="facebook" class="bg-white rounded-3xl p-8 md:p-12 shadow-lg mb-8">
+            <h3 class="text-3xl md:text-4xl font-bold text-center mb-6 text-blue-800">آخر منشوراتنا على فيسبوك</h3>
+            <div class="flex justify-center">
+                <div id="fb-root"></div>
+                <script async defer crossorigin="anonymous"
+                    src="https://connect.facebook.net/ar_AR/sdk.js#xfbml=1&version=v19.0&appId=YOUR_APP_ID"
+                    nonce="F48y84vR"></script>
+                <div class="fb-page" data-href="https://www.facebook.com/profile.php?id=100068031866007"
+                    data-tabs="timeline" data-width="500" data-height="600" data-small-header="false"
+                    data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false">
+                    <blockquote cite="https://www.facebook.com/profile.php?id=100068031866007"
+                        class="fb-xfbml-parse-ignore">
+                        <a href="https://www.facebook.com/profile.php?id=100068031866007">معمل الصياد للتحاليل
+                            الطبية</a>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="w-full bg-gray-800 text-white p-6 text-center rounded-t-3xl shadow-inner">
+        <p class="text-lg font-bold mb-2">معمل الصياد للتحاليل الطبية</p>
+        <p class="text-sm">📍 كوم الأمير – أعلى صيدلية دكتوره عليا الغالي</p>
+        <p class="text-sm">📞 +201153488808</p>
+        <p class="text-xs mt-4">&copy; 2024 جميع الحقوق محفوظة.</p>
+    </footer>
+
+    <!-- JavaScript code for Firebase logic -->
+    <script type="module">
+        // Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js";
+
+        // Your Firebase project configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSqpVH5LMQ6OiSqHNkHiIWyfsyT_d6sNY",
+            authDomain: "alsayadlab.firebaseapp.com",
+            projectId: "alsayadlab",
+            storageBucket: "alsayadlab.firebasestorage.app",
+            messagingSenderId: "560854383629",
+            appId: "1:560854383629:web:db689c6b8102259fb1a944",
+            measurementId: "G-V0MCDX3RX9"
+        };
+
+        // Initialize Firebase services
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        let userId = null;
+        let userRole = 'patient';
+
+        // Show/hide sections based on role
+        function showSections(role) {
+            document.getElementById('patient-section').classList.remove('hidden');
+            document.getElementById('adminSections').classList.add('hidden');
+            document.getElementById('loginModal').classList.add('hidden');
+
+            if (role === 'doctor' || role === 'technician') {
+                document.getElementById('adminSections').classList.remove('hidden');
+            }
+        }
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const loginCode = document.getElementById('loginCode').value.trim();
+            if (loginCode === 'DOC2024') {
+                userRole = 'doctor';
+                showSections(userRole);
+            } else if (loginCode === 'TECH2024') {
+                userRole = 'technician';
+                showSections(userRole);
+            } else {
+                alert('كود الدخول غير صحيح.');
+            }
+        });
+
+        // Hide login modal for patients on click outside
+        document.getElementById('loginModal').addEventListener('click', (e) => {
+            if (e.target.id === 'loginModal') {
+                showSections('patient');
+            }
+        });
+
+        // Initial authentication for patients
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+            } else {
+                await signInAnonymously(auth);
+                userId = auth.currentUser.uid;
+            }
+            document.getElementById('userIdDisplay').textContent = userId;
+            setupFirestoreListeners();
+        });
+
+        // Setup real-time listeners for Firestore data
+        function setupFirestoreListeners() {
+            // Listen for new public lab requests
+            const publicRequestsRef = collection(db, "lab_requests");
+            onSnapshot(publicRequestsRef, (snapshot) => {
+                const requestsList = document.getElementById('requestsList');
+                if (!requestsList) return;
+                requestsList.innerHTML = '';
+                if (snapshot.empty) {
+                    requestsList.innerHTML = '<p class="text-center text-gray-500">لا توجد طلبات جديدة.</p>';
+                } else {
+                    snapshot.forEach(requestDoc => {
+                        const data = requestDoc.data();
+                        const li = document.createElement('li');
+                        li.className = 'p-4 bg-white rounded-xl shadow-md mb-4';
+                        li.innerHTML = `
+                            <p class="font-bold">اسم المريض: ${data.patientName}</p>
+                            <p class="text-sm text-gray-600 mt-1">الطلب: ${data.requestDetails}</p>
+                            <p class="text-xs text-gray-400 mt-1">كود المريض: ${data.userId}</p>
+                            <div class="mt-4">
+                                <form id="replyForm-${requestDoc.id}" class="space-y-2">
+                                    <textarea name="replyText" placeholder="اكتب الرد هنا" rows="2" class="w-full p-2 rounded-lg border border-gray-300"></textarea>
+                                    <button type="submit" class="bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">إرسال الرد</button>
+                                </form>
+                            </div>
+                        `;
+                        requestsList.appendChild(li);
+                        document.getElementById(`replyForm-${requestDoc.id}`).addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            const replyText = e.target.replyText.value;
+
+                            try {
+                                // Add the reply to the patient's private collection
+                                await addDoc(collection(db, `users/${data.userId}/lab_results`), {
+                                    type: 'reply',
+                                    requestDetails: data.requestDetails,
+                                    replyText: replyText,
+                                    repliedBy: userRole,
+                                    replyDate: new Date().toISOString()
+                                });
+
+                                // Delete the request from the public inbox
+                                await deleteDoc(doc(db, "lab_requests", requestDoc.id));
+                                e.target.reset();
+                            } catch (error) {
+                                console.error("Error replying to request: ", error);
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Listen for new public appointment requests
+            const publicAppointmentsRef = collection(db, "appointments");
+            onSnapshot(publicAppointmentsRef, (snapshot) => {
+                const appointmentsList = document.getElementById('appointmentsList');
+                if (!appointmentsList) return;
+                appointmentsList.innerHTML = '';
+                if (snapshot.empty) {
+                    appointmentsList.innerHTML = '<p class="text-center text-gray-500">لا توجد طلبات مواعيد جديدة.</p>';
+                } else {
+                    snapshot.forEach(appointmentDoc => {
+                        const data = appointmentDoc.data();
+                        const li = document.createElement('li');
+                        li.className = 'p-4 bg-white rounded-xl shadow-md mb-4';
+                        li.innerHTML = `
+                            <p class="font-bold">اسم المريض: ${data.appointmentName}</p>
+                            <p class="text-sm text-gray-600 mt-1">السبب: ${data.appointmentReason}</p>
+                            <p class="text-sm text-gray-600 mt-1">التاريخ: ${new Date(data.appointmentDateTime).toLocaleDateString('ar-EG')}</p>
+                            <p class="text-sm text-gray-600 mt-1">الوقت: ${new Date(data.appointmentDateTime).toLocaleTimeString('ar-EG')}</p>
+                            <p class="text-xs text-gray-400 mt-1">كود المريض: ${data.userId}</p>
+                            <div class="mt-4 flex space-x-2 space-x-reverse">
+                                <button data-action="confirm" data-doc-id="${appointmentDoc.id}" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300">تأكيد الموعد</button>
+                                <button data-action="reject" data-doc-id="${appointmentDoc.id}" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300">رفض الموعد</button>
+                            </div>
+                        `;
+                        appointmentsList.appendChild(li);
+                    });
+                    // Add event listeners after rendering
+                    document.querySelectorAll('#appointmentsList button').forEach(button => {
+                        button.addEventListener('click', async (e) => {
+                            const docId = e.target.dataset.docId;
+                            const action = e.target.dataset.action;
+                            const docRef = doc(db, "appointments", docId);
+                            const appointmentDoc = await getDoc(docRef);
+                            const appointmentData = appointmentDoc.data();
+
+                            let replyText = '';
+                            if (action === 'confirm') {
+                                replyText = `تم تأكيد موعدك يوم ${new Date(appointmentData.appointmentDateTime).toLocaleDateString('ar-EG')} الساعة ${new Date(appointmentData.appointmentDateTime).toLocaleTimeString('ar-EG')}. ننتظرك!`;
+                            } else if (action === 'reject') {
+                                replyText = `نعتذر، تم رفض طلب موعدك لسبب ما. يرجى التواصل معنا للحصول على موعد آخر.`;
+                            }
+
+                            // Add reply to patient's private collection
+                            await addDoc(collection(db, `users/${appointmentData.userId}/lab_results`), {
+                                type: 'appointment-reply',
+                                appointmentReason: appointmentData.appointmentReason,
+                                replyText: replyText,
+                                status: action === 'confirm' ? 'confirmed' : 'rejected'
+                            });
+
+                            // Delete from public inbox
+                            await deleteDoc(docRef);
+                        });
+                    });
+                }
+            });
+
+            // Listen for user's private lab results and replies
+            const userResultsRef = collection(db, `users/${userId}/lab_results`);
+            onSnapshot(userResultsRef, (snapshot) => {
+                const resultsContainer = document.getElementById('myResults');
+                resultsContainer.innerHTML = '';
+                if (snapshot.empty) {
+                    resultsContainer.innerHTML = '<p class="text-center text-gray-500">لا توجد ردود أو نتائج متاحة حالياً.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const div = document.createElement('div');
+                        div.className = 'p-4 bg-white rounded-xl shadow-md mb-4';
+                        if (data.type === 'reply') {
+                            div.innerHTML = `
+                                <p class="font-bold">استفسارك: ${data.requestDetails}</p>
+                                <p class="text-green-600 mt-2"><strong>رد الإدارة:</strong> ${data.replyText}</p>
+                            `;
+                        } else if (data.type === 'result') {
+                            div.innerHTML = `
+                                <p class="font-bold">اسم التحليل: ${data.testName}</p>
+                                <p class="text-sm text-gray-600 mt-1">تاريخ الرفع: ${new Date(data.uploadDate).toLocaleDateString('ar-EG')}</p>
+                                <a href="${data.fileUrl}" target="_blank" class="bg-green-500 text-white font-bold py-2 px-4 rounded-lg mt-2 inline-block">تحميل النتيجة</a>
+                            `;
+                        } else if (data.type === 'appointment-reply') {
+                            const statusColor = data.status === 'confirmed' ? 'text-green-600' : 'text-red-600';
+                            div.innerHTML = `
+                                <p class="font-bold">طلب حجز موعد</p>
+                                <p class="text-sm text-gray-600 mt-1">السبب: ${data.appointmentReason}</p>
+                                <p class="${statusColor} mt-2"><strong>حالة الطلب:</strong> ${data.replyText}</p>
+                            `;
+                        }
+                        resultsContainer.appendChild(div);
+                    });
+                }
+            });
+        }
+
+        // Handle patient request form submission
+        document.getElementById('requestForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const patientName = document.getElementById('patientName').value;
+            const requestDetails = document.getElementById('requestDetails').value;
+            const requestMessage = document.getElementById('requestMessage');
+
+            requestMessage.textContent = 'جاري إرسال طلبك...';
+            requestMessage.className = 'mt-4 text-center p-3 rounded-xl bg-blue-100 text-blue-700';
+
+            try {
+                // Add the request to the public inbox
+                await addDoc(collection(db, "lab_requests"), {
+                    patientName: patientName,
+                    requestDetails: requestDetails,
+                    userId: userId,
+                    timestamp: new Date().toISOString()
+                });
+
+                requestMessage.textContent = `تم استلام طلبك يا ${patientName} بنجاح!`;
+                document.getElementById('requestForm').reset();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                requestMessage.textContent = "حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.";
+                requestMessage.className = 'mt-4 text-center p-3 rounded-xl bg-red-100 text-red-700';
+            }
+        });
+
+        // Handle patient appointment form submission
+        document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const appointmentName = document.getElementById('appointmentName').value;
+            const appointmentReason = document.getElementById('appointmentReason').value;
+            const appointmentDateTime = document.getElementById('appointmentDateTime').value;
+            const appointmentMessage = document.getElementById('appointmentMessage');
+
+            appointmentMessage.textContent = 'جاري إرسال طلب حجز الموعد...';
+            appointmentMessage.className = 'mt-4 text-center p-3 rounded-xl bg-blue-100 text-blue-700';
+
+            try {
+                await addDoc(collection(db, "appointments"), {
+                    appointmentName: appointmentName,
+                    appointmentReason: appointmentReason,
+                    appointmentDateTime: appointmentDateTime,
+                    userId: userId,
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                });
+
+                appointmentMessage.textContent = `تم استلام طلب حجز موعدك بنجاح! سيتم الرد عليك قريبًا.`;
+                document.getElementById('appointmentForm').reset();
+            } catch (error) {
+                console.error("Error adding appointment: ", error);
+                appointmentMessage.textContent = "حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.";
+                appointmentMessage.className = 'mt-4 text-center p-3 rounded-xl bg-red-100 text-red-700';
+            }
+        });
+
+        // Handle doctor result upload form submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const uploadPatientId = document.getElementById('uploadPatientId').value;
+            const testName = document.getElementById('testName').value;
+            const uploadFile = document.getElementById('uploadFile').files[0];
+            const uploadMessage = document.getElementById('uploadMessage');
+            const uploadLoader = document.getElementById('uploadLoader');
+
+            if (!uploadPatientId || !testName || !uploadFile) {
+                uploadMessage.textContent = "يرجى ملء جميع الحقول واختيار ملف.";
+                uploadMessage.className = 'mt-4 text-center p-3 rounded-xl bg-red-100 text-red-700';
+                return;
+            }
+
+            uploadLoader.classList.remove('hidden');
+            uploadMessage.classList.add('hidden');
+
+            try {
+                const filePath = `lab_results/${uploadPatientId}/${uploadFile.name}`;
+                const fileRef = ref(storage, filePath);
+                await uploadBytes(fileRef, uploadFile);
+
+                const fileUrl = await getDownloadURL(fileRef);
+
+                const privatePath = `users/${uploadPatientId}/lab_results`;
+                await addDoc(collection(db, privatePath), {
+                    type: 'result',
+                    testName: testName,
+                    fileUrl: fileUrl,
+                    uploadDate: new Date().toISOString()
+                });
+
+                uploadLoader.classList.add('hidden');
+                uploadMessage.textContent = `تم رفع النتيجة بنجاح للمريض ID: ${uploadPatientId}.`;
+                uploadMessage.className = 'mt-4 text-center p-3 rounded-xl bg-green-100 text-green-700';
+                document.getElementById('uploadForm').reset();
+            } catch (error) {
+                uploadLoader.classList.add('hidden');
+                console.error("Error uploading result: ", error);
+                uploadMessage.textContent = "حدث خطأ أثناء الرفع. يرجى التأكد من الكود أو الملف.";
+                uploadMessage.className = 'mt-4 text-center p-3 rounded-xl bg-red-100 text-red-700';
+            }
+        });
+    </script>
+</body>
+
+</html>
